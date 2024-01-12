@@ -4,8 +4,17 @@
 "Unive.rs" is a minimalistic Newtonian simulation of celestial bodies in space for which I am developing a set of minimalist 2D physics utilities. All utilities are intentionally simplistic, pure Rust. 
 
 ## Dependencies
-External crates intentionally are intentionally kept to a minimum. The Piston engine and OpenGL are used only to draw the 2D graphics to screen. 
- 
+External crates intentionally are intentionally kept to a minimum. The Piston engine and OpenGL are used only to draw the 2D graphics to screen. Two random number generation libraries are used to randomly initialise the celestial bodies. 
+```
+piston = "0.55.0"
+piston_window = "*"
+piston2d-graphics = "0.44.0"
+pistoncore-glutin_window = "0.72.0"
+piston2d-opengl_graphics = "0.83.0"
+rand = "0.8" 
+rand_distr = "*"
+```
+
 ## General components
  <a href="src/celestial_bodies/planet.rs"> Planet logic </a>
 
