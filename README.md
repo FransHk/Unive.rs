@@ -1,7 +1,7 @@
 # Unive.rs 🚀
 
 ## Description
-"Unive.rs" is a minimalistic, Newtonian simulation of celestial bodies in space for which I am developing a set of minimalist 2D physics utilities. All utilities are intentionally simplistic, pure Rust. 
+"Unive.rs" is a minimalistic Newtonian simulation of celestial bodies in space for which I am developing a set of minimalist 2D physics utilities. All utilities are intentionally simplistic, pure Rust. 
 
  
 ## General components
