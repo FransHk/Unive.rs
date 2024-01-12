@@ -30,21 +30,14 @@ For each unique pair, we apply the force and opposing force, respectively.
 
 ```rust
 let mut bottom: usize = 1;
-            // Handle gravitational force for unique planet pair
-            // e.g. for 5 planets we have 5+4+3+2+1=15 force calcs
             for i in 0..planets.len() {
-                // e.g. i = 1
                 for j in bottom..planets.len() {
                     if i != j {
-                        // Obtain force, it is always equal and opposite,
-                        // the .add_force method scales the force by the mass
-                        // of the body
                         let (force, force_inv) = grav_force(&planets[i], &planets[j], GRAV_CONST);
                         planets[i].add_force(force_inv);
                         planets[j].add_force(force);
                     }
                 }
-
                 bottom += 1;
             }
 ```
