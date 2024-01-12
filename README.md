@@ -16,6 +16,9 @@ rand_distr = "*"
 ```
 
 ## General components
+
+Computations are written from scratch, including linear algebra and other array manipulations. 
+
  <a href="src/celestial_bodies/planet.rs"> Planet logic </a>
  
  <a href="src/utils/array_logic.rs"> Linear algebra utilities </a>
