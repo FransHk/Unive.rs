@@ -17,11 +17,10 @@ rand_distr = "*"
 
 ## General components
  <a href="src/celestial_bodies/planet.rs"> Planet logic </a>
-
-## Computational components
  <a href="src/utils/array_logic.rs"> Linear algebra utilities </a>
  <a href="src/utils/physics.rs"> Newtonian gravity </a>
 
+## Computation
 We calculate the gravitational force between two celestial bodies in the following method. As per Newton's second law, gravitational
 force is opposite and equal between two bodies. 
 ```rust
