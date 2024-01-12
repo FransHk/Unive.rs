@@ -17,7 +17,9 @@ rand_distr = "*"
 
 ## General components
  <a href="src/celestial_bodies/planet.rs"> Planet logic </a>
+ 
  <a href="src/utils/array_logic.rs"> Linear algebra utilities </a>
+ 
  <a href="src/utils/physics.rs"> Newtonian gravity </a>
 
 ## Computation
