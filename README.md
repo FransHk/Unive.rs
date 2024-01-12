@@ -24,7 +24,31 @@ pub fn grav_force<C: CelestialBody>(mass1: &C, mass2: &C, g: f64) -> ([f64; 2], 
     (force, force_inv)
 }
 ```
-However, two bodies are not always equally affected. The force exerted between the earth and moon is equal and opposite, yet the moon is accelerated more than the earth. This reflected 
+As an optimisation, we leverage the concept that Newtonian gravitational forces between two bodies are exactly equal and opposite to each other,
+Thus, instead of calculating all possible celestial body pairs, we only look at unique pairs. For example, with planets [1,2,3], we get 3 pairs: (1,2), (1,3) and (2,3) instead of 3x2=6 non-unique pairs. 
+For each unique pair, we apply the force and opposing force, respectively.
+
+```rust
+let mut bottom: usize = 1;
+            // Handle gravitational force for unique planet pair
+            // e.g. for 5 planets we have 5+4+3+2+1=15 force calcs
+            for i in 0..planets.len() {
+                // e.g. i = 1
+                for j in bottom..planets.len() {
+                    if i != j {
+                        // Obtain force, it is always equal and opposite,
+                        // the .add_force method scales the force by the mass
+                        // of the body
+                        let (force, force_inv) = grav_force(&planets[i], &planets[j], GRAV_CONST);
+                        planets[i].add_force(force_inv);
+                        planets[j].add_force(force);
+                    }
+                }
+
+                bottom += 1;
+            }
+```
+However, two bodies are not always equally affected. For example, the force exerted between the earth and moon is equal and opposite, yet the moon is accelerated more than the earth. This reflected 
 in how we handle adding forces to celestial bodies. More specifically, applied force is inversely proportional to the body's mass. 
 ```rust
     /// Adds a 2-dimensional force to the body,
@@ -35,5 +59,4 @@ in how we handle adding forces to celestial bodies. More specifically, applied f
         self.velocity = al::add_arrays(self.velocity, scaled_force);
     }
 ```
-
 
