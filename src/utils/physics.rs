@@ -1,4 +1,4 @@
-use super::array_logic::{dot_product, scalar_mult, subtract_arrays, Length, Normalise};
+use super::array_logic::{dot_product, scalar_mult, subtract_arrays, Normalise};
 use crate::celestial_bodies::body_config::CelestialBody;
 
 /// Calculate the gravitational force between two bodies,

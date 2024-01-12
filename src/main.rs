@@ -13,6 +13,7 @@ use utils::physics::grav_force;
 
 const WHITE: Colour = [1.0; 4];
 const BLACK: Colour = [0.0, 0.0, 0.0, 1.0];
+const RED: Colour = [1.0, 0.0, 0.0, 1.0];
 const GRAV_CONST: f64 = 2.0;
 
 // Some constants used throughout the code
@@ -21,11 +22,14 @@ const GRAV_CONST: f64 = 2.0;
 fn create_planets(amt_planet: u32, bounds: f64) -> Vec<Planet> {
     //(Planet, Vec<Planet>) {
     let mut planets = Vec::<Planet>::new();
-    let planet_const = PlanetConfig::new(0.0, bounds, 1.3, 5.0, 10.0, 0.2);
+    let planet_const = PlanetConfig::new(0.0, bounds, 0.5, 4.0, 5.0, 0.2);
     for i in 0..amt_planet {
         planets.push(Planet::new(&planet_const, i, WHITE));
     }
-
+    let planet_const = PlanetConfig::new(0.0, bounds, 0.3, 500.0, 5.0, 0.01);
+    for i in 0..4 {
+        planets.push(Planet::new(&planet_const, i, RED));
+    }
     planets
 }
 
@@ -33,7 +37,7 @@ fn main() {
     // SET UP THE MAIN CONFIG DATA
     let bounds: f64 = 1028.0; // window size
     let centre: [f64; 2] = [bounds * 0.5, bounds * 0.5];
-    let mut planets = create_planets(100, bounds);
+    let mut planets = create_planets(30, bounds);
 
     let opengl = OpenGL::V3_2;
     let settings = WindowSettings::new("Window", [bounds; 2]).exit_on_esc(true);
@@ -46,7 +50,6 @@ fn main() {
     // for collisions.
     while let Some(e) = events.next(&mut window) {
         // Render step, all planetary bodies
-        //
         if let Some(r) = e.render_args() {
             gl.draw(r.viewport(), |c: graphics::Context, g: &mut GlGraphics| {
                 graphics::clear(BLACK, g);
@@ -69,7 +72,6 @@ fn main() {
             // Handle gravitational force for unique planet pair
             // e.g. for 5 planets we have 5+4+3+2+1=15 force calcs
             for i in 0..planets.len() {
-                // e.g. i = 1
                 for j in bottom..planets.len() {
                     if i != j {
                         // Obtain force, it is always equal and opposite,

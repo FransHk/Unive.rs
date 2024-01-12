@@ -11,8 +11,8 @@ pub trait Normalise {
 impl Normalise for [f64; 2] {
     fn normalise(&self) -> [f64; 2] {
         let length = &self.get_length();
-        let frac = 1.0 / length; // Get normalisation scalar
-        scalar_mult(*self, frac) // Mult vector with norm scalar to get norm vector
+        let frac = 1.0 / length;
+        scalar_mult(*self, frac)
     }
 }
 

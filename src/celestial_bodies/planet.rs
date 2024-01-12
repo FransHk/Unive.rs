@@ -24,6 +24,7 @@ impl Planet {
             config: planet_const.clone(),
         }
     }
+
     fn configure_planet(planet_const: &PlanetConfig) -> ([f64; 2], [f64; 2], f64) {
         let mut rng = rand::thread_rng();
         let x = rng.gen_range(planet_const.lower_pos_bound..planet_const.upper_pos_bound);
@@ -43,11 +44,11 @@ impl Planet {
         let (pos, vel, mass) = Planet::configure_planet(&self.config);
         self.position = pos;
         self.velocity = vel;
-        self.mass = mass;
-        self.size = [
-            mass * self.config.mass_to_size,
-            mass * self.config.mass_to_size,
-        ];
+        // self.mass = mass;
+        // self.size = [
+        //     mass * self.config.mass_to_size,
+        //     mass * self.config.mass_to_size,
+        // ];
     }
 
     /// Adds a 2-dimensional force to the body,
