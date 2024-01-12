@@ -1,5 +1,5 @@
 use super::body_config::*;
-use crate::utils::array_logic as al;
+use crate::utils::array_logic::{self as al, Length};
 use crate::utils::colour::Colour;
 use opengl_graphics::GlGraphics;
 use piston::input::UpdateArgs;
@@ -84,7 +84,7 @@ impl Planet {
     /// reset planet's pos, vel, etc.
     pub fn check_dist_from_centre(&mut self, centre: [f64; 2]) {
         let dist = al::subtract_arrays(self.pos(), centre);
-        let dist_len = al::get_length(dist);
+        let dist_len = dist.get_length();
 
         if (dist_len > 700.0) {
             self.reset_planet();
