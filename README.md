@@ -29,7 +29,7 @@ Thus, instead of calculating all possible celestial body pairs, we only look at 
 For each unique pair, we apply the force and opposing force, respectively.
 
 ```rust
-let mut bottom: usize = 1;
+            let mut bottom: usize = 1;
             for i in 0..planets.len() {
                 for j in bottom..planets.len() {
                     if i != j {
