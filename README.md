@@ -1,18 +1,18 @@
 # Unive.rs 🚀
 
 ## Description
-"Unive.rs" is a Newtonian simulation of celestial bodies in space for which I am developing a set of minimal 2D physics utilities. All utilities are intentionally simplistic, pure Rust. 
+"Unive.rs" is a Newtonian simulation of celestial bodies in space for which I am developing a set of minimal 2D physics utilities. All utilities are intentionally simplistic, pure Rust. The code is deployed to WebAssembly (WASM) and runs in the browser.
+
+## Try it 
+Unive.rs is live <a href="https://franshk.github.io/Unive.rs"> here </a>.
 
 ## Dependencies
-External crates are intentionally kept to a minimum. The Piston engine and OpenGL are used only to draw the 2D graphics to screen. Two random number generation libraries are used to randomly initialise the celestial bodies. 
+External crates are intentionally kept to a minimum. The Bevy engine is used as update loop and renderer. It also provides the WASM integration used to deploy this Rust simulation to the web.
 ```
-piston = "0.55.0"
-piston_window = "*"
-piston2d-graphics = "0.44.0"
-pistoncore-glutin_window = "0.72.0"
-piston2d-opengl_graphics = "0.83.0"
+[dependencies]
 rand = "0.8" 
-rand_distr = "*"
+rand_distr = "*" 
+bevy = "0.13.0"
 ```
 
 ## General components
