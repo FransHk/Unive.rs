@@ -1,90 +1,94 @@
+use bevy::prelude::*;
 mod celestial_bodies;
 mod utils;
-
 use celestial_bodies::body_config::*;
 use celestial_bodies::planet::Planet;
-use glutin_window::GlutinWindow;
-use opengl_graphics::{GlGraphics, OpenGL};
-use piston::event_loop::{EventSettings, Events};
-use piston::input::{RenderEvent, UpdateEvent};
-use piston::WindowSettings;
+use rand::Rng;
 use utils::colour::Colour;
 use utils::physics::grav_force;
-
 const WHITE: Colour = [1.0; 4];
-const BLACK: Colour = [0.0, 0.0, 0.0, 1.0];
-const RED: Colour = [1.0, 0.0, 0.0, 1.0];
-const GRAV_CONST: f64 = 2.0;
-
-// Some constants used throughout the code
-// Create a set of planets according to
-// a normal distribution
-fn create_planets(amt_planet: u32, bounds: f64) -> Vec<Planet> {
-    //(Planet, Vec<Planet>) {
-    let mut planets = Vec::<Planet>::new();
-    let planet_const = PlanetConfig::new(0.0, bounds, 0.5, 4.0, 5.0, 0.2);
-    for i in 0..amt_planet {
-        planets.push(Planet::new(&planet_const, i, WHITE));
-    }
-    let planet_const = PlanetConfig::new(0.0, bounds, 0.3, 500.0, 5.0, 0.01);
-    for i in 0..4 {
-        planets.push(Planet::new(&planet_const, i, RED));
-    }
-    planets
-}
 
 fn main() {
-    // SET UP THE MAIN CONFIG DATA
-    let bounds: f64 = 1028.0; // window size
-    let centre: [f64; 2] = [bounds * 0.5, bounds * 0.5];
-    let mut planets = create_planets(30, bounds);
+    App::new()
+        .insert_resource(ClearColor(Color::rgb(0., 0., 0.05)))
+        .add_plugins(DefaultPlugins)
+        .add_systems(Startup, setup)
+        .add_systems(Update, sprite_movement)
+        .run();
+}
 
-    let opengl = OpenGL::V3_2;
-    let settings = WindowSettings::new("Window", [bounds; 2]).exit_on_esc(true);
-    let mut window: GlutinWindow = settings.build().expect("Could not create window");
-    let mut gl = GlGraphics::new(opengl);
-    let mut events = Events::new(EventSettings::new());
+fn gen_sprite(
+    planet: &Planet,
+    asset_server: &Res<AssetServer>,
+    sprite_path: String,
+) -> SpriteBundle {
+    let sprite = SpriteBundle {
+        texture: asset_server.load(sprite_path),
+        transform: Transform {
+            scale: Vec3::new(planet.size[0], planet.size[1], 0.),
+            translation: Vec3::new(planet.position[0], planet.position[1], 0.),
+            rotation: Quat::from_rotation_z(60.0),
+            ..default()
+        },
+        ..default()
+    };
 
-    // Game loop. First, render every object (planet),
-    // then, update each planet's position and check
-    // for collisions.
-    while let Some(e) = events.next(&mut window) {
-        // Render step, all planetary bodies
-        if let Some(r) = e.render_args() {
-            gl.draw(r.viewport(), |c: graphics::Context, g: &mut GlGraphics| {
-                graphics::clear(BLACK, g);
-                for planet in planets.iter() {
-                    planet.draw(c, g);
-                }
-            });
-        }
+    sprite
+}
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let planet_const = PlanetConfig::new(-400., 400.0, 50.0, 10.0, 3.0, 0.001);
+    let mut rng = rand::thread_rng();
+    let sun_const = PlanetConfig::new(-150., 150.0, 0.001, 7000.0, 5.0, 0.00002);
+    let planet_amt = 5;
+    let paths = vec![
+        "earth.png".to_owned(),
+        "jupiter.png".to_owned(),
+        "moon.png".to_owned(),
+        "red.png".to_owned(),
+        "venus.png".to_owned(),
+        "water.png".to_owned(),
+    ];
+    commands.spawn(Camera2dBundle::default());
 
-        // Update step, each planet moves by its vel
-        // scaled by dt for a frame-independent movement
-        if let Some(args) = e.update_args() {
-            // Handle step-wise update of each planet
-            for planet in planets.iter_mut() {
-                planet.update(&args); // pass update args for 'dt' value to scale movement
-                planet.check_dist_from_centre(centre);
+    for i in 0..planet_amt {
+        let rand_sprite_index = rng.gen_range(0..paths.len());
+        let sprite = &paths[rand_sprite_index];
+        let planet = Planet::new(&planet_const, i);
+        let sprite = gen_sprite(&planet, &asset_server, sprite.to_string());
+        commands.spawn((planet.clone(), sprite.clone()));
+    }
+
+    let sun = Planet::new(&sun_const, planet_amt);
+    let sprite = gen_sprite(&sun, &asset_server, "moon.png".to_string());
+    commands.spawn((sun.clone(), sprite.clone()));
+}
+
+fn sprite_movement(time: Res<Time>, mut planets: Query<(Entity, &mut Planet, &mut Transform)>) {
+    let mut entity_ids: Vec<Entity> = Vec::new();
+    for (e, mut planet, mut transform) in &mut planets {
+        planet.update(time.delta_seconds());
+
+        transform.translation.x = planet.position[0];
+        transform.translation.y = planet.position[1];
+        planet.check_dist_from_centre([0.0, 0.0]);
+        entity_ids.push(e);
+    }
+    let mut bottom: usize = 1;
+    for i in 0..entity_ids.len() {
+        for j in bottom..entity_ids.len() {
+            if i != j {
+                let entity_1 = planets.get(entity_ids[i]).expect("");
+                let entity_2 = planets.get(entity_ids[j]).expect("");
+                let (force, force_inv) = grav_force(&entity_1.1, &entity_2.1, 1.);
+                planets
+                    .get_mut(entity_ids[i])
+                    .expect("")
+                    .1
+                    .add_force(force_inv);
+
+                planets.get_mut(entity_ids[j]).expect("").1.add_force(force);
             }
-
-            let mut bottom: usize = 1;
-            // Handle gravitational force for unique planet pair
-            // e.g. for 5 planets we have 5+4+3+2+1=15 force calcs
-            for i in 0..planets.len() {
-                for j in bottom..planets.len() {
-                    if i != j {
-                        // Obtain force, it is always equal and opposite,
-                        // the .add_force method scales the force by the mass
-                        // of the body
-                        let (force, force_inv) = grav_force(&planets[i], &planets[j], GRAV_CONST);
-                        planets[i].add_force(force_inv);
-                        planets[j].add_force(force);
-                    }
-                }
-
-                bottom += 1;
-            }
         }
+        bottom += 1;
     }
 }
